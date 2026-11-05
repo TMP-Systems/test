@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matrix Landing Page</title>
+    <style>
+        /* Reset and prevent scrolling */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #000;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        /* Background Canvas */
+        #matrix-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        /* Overlay Interface Container */
+        .interface-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.7));
+        }
+
+        /* Optional Header Title */
+        .title {
+            color: #33ff66;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            margin-bottom: 40px;
+            font-size: 24px;
+            text-shadow: 0 0 10px #33ff66;
+            font-weight: bold;
+        }
+
+        /* Button Grid/Row Wrapper */
+        .button-group {
+            display: flex;
+            gap: 25px;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        /* Circular Button Styling */
+        .matrix-btn {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            border: 2px solid #33ff66;
+            background: rgba(0, 0, 0, 0.75);
+            color: #33ff66;
+            text-decoration: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 14px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(51, 255, 102, 0.2), inset 0 0 10px rgba(51, 255, 102, 0.1);
+            text-align: center;
+            padding: 5px;
+            box-sizing: border-box;
+        }
+
+        /* Hover Effects */
+        .matrix-btn:hover {
+            background: #33ff66;
+            color: #000;
+            box-shadow: 0 0 25px #33ff66, inset 0 0 10px rgba(0, 0, 0, 0.5);
+            transform: scale(1.1);
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background Canvas -->
+    <canvas id="matrix-canvas"></canvas>
+
+    <!-- Foreground Content Layer -->
+    <div class="interface-container">
+        <div class="title">Select Destination</div>
+        
+        <div class="button-group">
+            <!-- Replace the href="#" with your desired URLs -->
+            <a href="page1.html" class="matrix-btn">Page 1</a>
+            <a href="https://tmp-systems.github.io/test1/page2.html" class="matrix-btn">Page 2</a>
+            <a href="https://tmp-systems.github.io/test1/page3.html" class="matrix-btn">Page 3</a>
+            <a href="https://tmp-systems.github.io/test1/page4.html" class="matrix-btn">Page 4</a>
+            <a href="https://tmp-systems.github.io/test1/page5.html" class="matrix-btn">Page 5</a>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('matrix-canvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            columns = Math.floor(canvas.width / fontSize);
+            drops = Array(columns).fill(0).map(() => Math.random() * -canvas.height / fontSize);
+        }
+
+        // Authentic Matrix code features: Reversed half-width Katakana, numerals, and select symbols
+        const letters = 'ｦｱｳｴｵｶｷｹｺｻｼｽｾｿﾀﾂﾃﾅﾆﾇﾈﾊﾋﾎﾏﾐﾑﾒﾓﾔﾕﾗﾘﾜ012345789Z:."=*+-<>¦';
+        const fontSize = 14;
+        let columns;
+        let drops;
+
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        function drawMatrix() {
+            // Trail effect: trails are long and fade gently
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.08)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Set the correct code font style
+            ctx.font = 'bold ' + fontSize + 'px monospace';
+
+            for (let i = 0; i < drops.length; i++) {
+                // Generate random lore character
+                const text = letters.charAt(Math.floor(Math.random() * letters.length));
+                const x = i * fontSize;
+                const y = drops[i] * fontSize;
+
+                // Lore Accuracy: Mirror the characters horizontally to look backwards (coded view)
+                ctx.save();
+                ctx.translate(x + fontSize / 2, y - fontSize / 2);
+                ctx.scale(-1, 1);
+                
+                // Lore Accuracy: The leading character of each stream must be bright white
+                ctx.fillStyle = '#ffffff';
+                ctx.shadowColor = '#33ff66';
+                ctx.shadowBlur = 8;
+                ctx.fillText(text, -fontSize / 2, fontSize / 2);
+                ctx.restore();
+
+                // Subsequent steps in the loop color characters behind the leader a rich green
+                // This naturally creates the iconic bright head with a fading body
+                if (drops[i] > 1) {
+                    ctx.save();
+                    ctx.translate(x + fontSize / 2, (drops[i] - 1) * fontSize - fontSize / 2);
+                    ctx.scale(-1, 1);
+                    ctx.fillStyle = '#33ff66';
+                    ctx.shadowBlur = 2;
+                    ctx.fillText(letters.charAt(Math.floor(Math.random() * letters.length)), -fontSize / 2, fontSize / 2);
+                    ctx.restore();
+                }
+
+                // Wrap streams independently back to the top once they exit the screen
+                if (y > canvas.height && Math.random() > 0.98) {
+                    drops[i] = 0;
+                }
+
+                // Speed variation simulation: uniform steps per frame, staggered restarts
+                drops[i]++;
+            }
+        }
+
+        // The digital rain falls rapidly: ~30ms interval brings it closer to film speed
+        setInterval(drawMatrix, 33);
+    </script>
+</body>
+</html>
